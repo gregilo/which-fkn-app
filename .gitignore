@@ -1,1 +1,54 @@
+# Generated schedule data
 public/data/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+.npm/
+.node_repl_history
+*.tgz
+coverage/
+.nyc_output/
+
+# pnpm (pnpm-lock.yaml is the only lockfile; keep it tracked)
+.pnpm-store/
+.pnpm-debug.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*~
+
+# Agent tooling
+.omp/
