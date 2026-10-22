@@ -1,0 +1,72 @@
+:root {
+  --primary: #003da6;
+  --accent: #dd0031;
+  --border: #d5d9e0;
+  --muted: #5b6573;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0 auto;
+  max-width: 760px;
+  padding: 1rem;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.4;
+  color: #14181f;
+}
+
+h1 { margin: 0 0 0.25rem; color: var(--primary); font-size: 1.5rem; }
+header p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.stale { color: var(--accent); font-weight: 600; }
+
+.market {
+  display: inline-flex;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.market legend { padding: 0; margin-bottom: 0.25rem; float: left; width: 100%; font-size: 0.85rem; color: var(--muted); }
+.market label {
+  position: relative;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+.market input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.market label:has(input:checked) { background: var(--primary); color: #fff; }
+.market label:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: -3px; }
+
+#games { list-style: none; margin: 1rem 0; padding: 0; }
+.game {
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border);
+}
+.game.past { opacity: 0.5; }
+.when { font-weight: 600; }
+.when .time { color: var(--muted); font-weight: 400; margin-left: 0.5rem; }
+.matchup { font-size: 1.05rem; }
+.tag, .chip {
+  display: inline-block;
+  margin: 0.2rem 0.3rem 0 0;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+}
+.tag { background: #fde8ec; color: var(--accent); }
+.chip { background: #e6edf9; color: var(--primary); }
+.chip.unknown { background: #eee; color: var(--muted); border: 1px dashed var(--muted); }
+.line { margin-top: 0.25rem; font-size: 0.9rem; }
+.line b { color: var(--primary); }
+.note, .empty { color: var(--muted); }
+.footnote { color: var(--muted); font-size: 0.8rem; }
+.message { color: var(--muted); padding: 1rem 0; }

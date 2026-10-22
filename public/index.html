@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Which F'n App — 76ers</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header>
+    <h1>Which F'n App — 76ers</h1>
+    <p id="season"></p>
+    <p id="status"></p>
+    <fieldset class="market">
+      <legend>Watching from</legend>
+      <label><input type="radio" name="market" value="out"> Outside Philly market</label>
+      <label><input type="radio" name="market" value="in"> Philly market</label>
+    </fieldset>
+  </header>
+  <main>
+    <ol id="games"></ol>
+    <p class="footnote">US viewing rules. League Pass is subject to local blackouts, including the opponent's home market.</p>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
