@@ -6,6 +6,7 @@
     "node": ">=26.8.2 <27"
   },
   "scripts": {
+    "assets": "node scripts/assets.js",
     "update": "node scripts/update.js",
     "start": "node scripts/serve.js",
     "test": "node --test"

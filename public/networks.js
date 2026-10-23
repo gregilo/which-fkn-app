@@ -115,6 +115,20 @@ export const LEAGUE_PASS_APPS = [
   { app: 'Prime Video', kind: 'direct', note: 'NBA League Pass channel, subject to blackouts' },
 ];
 
+// Official App Store icons, vendored by `npm run assets` into public/icons/.
+export const APPS = {
+  Peacock: { appStoreId: 1508186374, icon: 'icons/peacock.png' },
+  'NBC Sports app': { appStoreId: 542511686, icon: 'icons/nbc-sports.png' },
+  'ESPN app': { appStoreId: 317469184, icon: 'icons/espn.png' },
+  'Prime Video': { appStoreId: 545519333, icon: 'icons/prime-video.png' },
+  'NBA app': { appStoreId: 484672289, icon: 'icons/nba.png' },
+  'YouTube TV': { appStoreId: 1193350206, icon: 'icons/youtube-tv.png' },
+  'Hulu + Live TV': { appStoreId: 376510438, icon: 'icons/hulu.png' },
+  Fubo: { appStoreId: 905401434, icon: 'icons/fubo.png' },
+  'Sling TV': { appStoreId: 945077360, icon: 'icons/sling-tv.png' },
+  DIRECTV: { appStoreId: 1136238277, icon: 'icons/directv.png' },
+};
+
 function addApp(list, { app, note }) {
   if (!list.some((x) => x.app === app)) list.push({ app, note: note ?? null });
 }

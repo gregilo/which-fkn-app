@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveNetwork, watchOptions } from '../public/networks.js';
+import { existsSync } from 'node:fs';
+import { APPS, LEAGUE_PASS_APPS, NETWORKS, resolveNetwork, watchOptions } from '../public/networks.js';
 
 const b = (name, abbr) => ({ name, abbr });
 const NBCSP = b('NBC Sports Philadelphia', 'NBCSP/PCK-PHI');
@@ -87,5 +88,13 @@ test('(i) NBCSN-only national', () => {
     const r = watchOptions(g, m);
     assert.deepEqual(apps(r.direct), ['Peacock']);
     assert.deepEqual(apps(r.live), ['YouTube TV', 'Fubo']);
+  }
+});
+
+test('(j) every listed app has a vendored icon', () => {
+  const names = new Set([...Object.values(NETWORKS).flatMap((n) => n.apps.map((a) => a.app)), ...LEAGUE_PASS_APPS.map((a) => a.app)]);
+  for (const name of names) {
+    assert.ok(APPS[name], `APPS is missing "${name}"`);
+    assert.ok(existsSync(new URL(`../public/${APPS[name].icon}`, import.meta.url)), `missing file public/${APPS[name].icon}`);
   }
 });

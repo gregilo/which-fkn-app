@@ -61,6 +61,7 @@ test('away game takes local broadcasters from awayTvBroadcasters', () => {
   const { games } = normalizeSchedule(nextData([game({ homeTeam: DET, awayTeam: PHI })]));
   assert.equal(games[0].home, false);
   assert.equal(games[0].opponent.tricode, 'DET');
+  assert.equal(games[0].opponent.teamId, 1610612765);
   assert.deepEqual(games[0].broadcasts.local, [{ name: 'Fox Detroit', abbr: 'FDET' }]);
 });
 

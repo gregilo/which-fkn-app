@@ -51,6 +51,7 @@ function mapGame(g) {
     statusText,
     home,
     opponent: {
+      teamId: opp.teamId,
       tricode: opp.teamTricode,
       name: `${opp.teamCity} ${opp.teamName}`,
     },
