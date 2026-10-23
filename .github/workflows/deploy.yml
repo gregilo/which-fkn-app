@@ -1,0 +1,57 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  actions: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Public repos disable cron workflows after 60 days without activity; re-enabling keeps it alive.
+      - name: Keep schedule enabled
+        run: gh workflow enable deploy.yml --repo "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .tool-versions
+      - run: node --test
+      - id: pages
+        uses: actions/configure-pages@v5
+      - name: Update schedule
+        run: |
+          if node scripts/update.js; then exit 0; fi
+          if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
+            echo "::error::NBA.com update failed; keeping the currently deployed site"
+            exit 1
+          fi
+          echo "::warning::NBA.com update failed; redeploying with the currently published schedule"
+          curl -fsSL --create-dirs -o public/data/schedule.json "${{ steps.pages.outputs.base_url }}/data/schedule.json"
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

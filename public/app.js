@@ -58,7 +58,7 @@ function renderHeader() {
   }
   statusEl.append(`Updated ${formatted}`);
   if (!Number.isFinite(fetched) || Date.now() - fetched > STALE_MS) {
-    statusEl.append(el('span', 'stale', ' — data may be stale, run npm run update'));
+    statusEl.append(el('span', 'stale', ' — data may be stale'));
   }
 }
 
@@ -198,7 +198,7 @@ async function load() {
     render();
   } catch {
     if (!data) {
-      gamesEl.replaceChildren(el('li', 'message', 'No schedule data yet. Run `npm run update` (or `npm start`).'));
+      gamesEl.replaceChildren(el('li', 'message', "Couldn't load schedule data. Try again later."));
     } else {
       refreshFailed = true;
       renderHeader();
