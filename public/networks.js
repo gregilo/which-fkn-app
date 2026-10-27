@@ -170,3 +170,26 @@ export function watchOptions(game, market) {
       : 'No out-of-market option listed yet';
   return { networks, direct, live: liveApps, empty, emptyMessage };
 }
+
+export const NOT_ON_SERVICES = 'Not on your services';
+
+// Limits watchOptions() output to the apps in `services` (a Set of APPS names).
+export function onlyServices(opts, services) {
+  const direct = opts.direct.filter((a) => services.has(a.app));
+  const live = opts.live.filter((a) => services.has(a.app));
+  const empty = direct.length === 0 && live.length === 0;
+  const emptyMessage = !empty ? null : opts.empty ? opts.emptyMessage : NOT_ON_SERVICES;
+  return { ...opts, direct, live, empty, emptyMessage };
+}
+
+// Parses the stored wfa.services value (string or null) into a Set of known APPS names.
+export function parseServices(raw) {
+  let list;
+  try {
+    list = JSON.parse(raw);
+  } catch {
+    return new Set();
+  }
+  if (!Array.isArray(list)) return new Set();
+  return new Set(list.filter((n) => typeof n === 'string' && Object.hasOwn(APPS, n)));
+}

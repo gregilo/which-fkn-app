@@ -119,6 +119,54 @@ h1 { margin: 0; font-size: 1.5rem; color: #fff; }
   .switch .track, .switch .track::after { transition: none; }
 }
 
+.switch:has(input[aria-disabled="true"]) .track { opacity: 0.55; }
+.switch:has(input[aria-disabled="true"]) { cursor: not-allowed; }
+.switch input[aria-disabled="true"] { cursor: not-allowed; }
+.switch:has(input[aria-disabled="true"]) .track { background: rgba(255, 255, 255, 0.35); }
+.switch:has(input[aria-disabled="true"]) .track::after { transform: none; }
+.switch-group { position: relative; display: flex; align-items: center; }
+.hint {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 1;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--primary);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.switch:hover:has(input[aria-disabled="true"]) + .hint,
+.switch:has(input[aria-disabled="true"]:focus-visible) + .hint,
+.hint.is-open { display: block; }
+
+.services { margin-top: 0.75rem; color: #fff; font-size: 0.9rem; }
+.services summary { cursor: pointer; width: fit-content; }
+.services summary:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.service-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+.service {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem 0.3rem 0.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.service input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.service .app-icon { width: 24px; height: 24px; }
+.service:has(input:checked) { background: #fff; color: var(--primary); }
+.service:has(input:focus-visible) { outline: 3px solid #fff; outline-offset: 2px; }
+
 #games { list-style: none; margin: 1rem 0; padding: 0; display: grid; gap: 0.75rem; }
 .game {
   display: grid;

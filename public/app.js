@@ -1,9 +1,11 @@
-import { APPS, watchOptions } from './networks.js';
+import { APPS, onlyServices, parseServices, watchOptions } from './networks.js';
 
 const REFRESH_MS = 10 * 60 * 1000;
 const STALE_MS = 24 * 60 * 60 * 1000;
 const STORAGE_KEY = 'wfa.market';
 const PAST_KEY = 'wfa.showPast';
+const SERVICES_KEY = 'wfa.services';
+const ONLY_MINE_KEY = 'wfa.onlyMine';
 
 const dowFmt = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
 const dowFmtUtc = new Intl.DateTimeFormat(undefined, { weekday: 'short', timeZone: 'UTC' });
@@ -22,6 +24,10 @@ const gamesEl = document.getElementById('games');
 const radios = [...document.querySelectorAll('input[name="market"]')];
 const pastToggle = document.getElementById('show-past');
 const pastCountEl = document.getElementById('past-count');
+const onlyMineToggle = document.getElementById('only-mine');
+const onlyMineHint = document.getElementById('only-mine-hint');
+const servicesCountEl = document.getElementById('services-count');
+const serviceListEl = document.getElementById('service-list');
 
 let data = null;
 let hasScrolled = false;
@@ -106,7 +112,7 @@ function appGroup(title, items) {
   return group;
 }
 
-function renderGame(game, market, isNext) {
+function renderGame(game, market, isNext, mine) {
   const li = el('li', 'game');
   if (game.status === 3) li.classList.add('past');
   if (isNext) li.classList.add('next');
@@ -140,7 +146,8 @@ function renderGame(game, market, isNext) {
   if (game.ifNecessary) tags.append(el('span', 'tag', 'If necessary'));
   if (tags.childNodes.length) body.append(tags);
 
-  const opts = watchOptions(game, market);
+  const all = watchOptions(game, market);
+  const opts = mine ? onlyServices(all, mine) : all;
   const chips = el('div', 'networks');
   for (const n of opts.networks) {
     const chip = el('span', n.known ? 'chip' : 'chip unknown', n.label);
@@ -165,6 +172,32 @@ function readShowPast() {
   }
 }
 
+function readOnlyMine() {
+  try {
+    return localStorage.getItem(ONLY_MINE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function readServices() {
+  try {
+    return parseServices(localStorage.getItem(SERVICES_KEY));
+  } catch {
+    return new Set();
+  }
+}
+
+let services = readServices();
+
+function saveServices() {
+  try {
+    localStorage.setItem(SERVICES_KEY, JSON.stringify(Object.keys(APPS).filter((n) => services.has(n))));
+  } catch {
+    // storage unavailable; selection still applies for this session
+  }
+}
+
 function scrollToNext() {
   gamesEl.querySelector('.game.next')?.scrollIntoView({ block: 'center' });
 }
@@ -173,6 +206,7 @@ function render() {
   renderHeader();
   if (!data) return;
   const market = currentMarket();
+  const mine = onlyMineToggle.checked && services.size > 0 ? services : null;
   const pastCount = data.games.filter((g) => g.status === 3).length;
   pastCountEl.textContent = pastCount ? `(${pastCount})` : '';
   const nextId = data.games.find((g) => g.status !== 3)?.id;
@@ -180,7 +214,7 @@ function render() {
   if (visible.length === 0) {
     gamesEl.replaceChildren(el('li', 'message', 'No upcoming games. Turn on "Show past games" to see results.'));
   } else {
-    gamesEl.replaceChildren(...visible.map((g) => renderGame(g, market, g.id === nextId)));
+    gamesEl.replaceChildren(...visible.map((g) => renderGame(g, market, g.id === nextId, mine)));
   }
   if (!hasScrolled) {
     hasScrolled = true;
@@ -230,6 +264,58 @@ pastToggle.addEventListener('change', () => {
   render();
   scrollToNext();
 });
+
+function syncServiceControls() {
+  servicesCountEl.textContent = services.size ? `(${services.size})` : '';
+  if (services.size) {
+    onlyMineToggle.removeAttribute('aria-disabled');
+    onlyMineToggle.removeAttribute('aria-describedby');
+    onlyMineHint.classList.remove('is-open');
+  } else {
+    onlyMineToggle.setAttribute('aria-disabled', 'true');
+    onlyMineToggle.setAttribute('aria-describedby', 'only-mine-hint');
+  }
+}
+
+for (const name of Object.keys(APPS)) {
+  const label = el('label', 'service');
+  const box = document.createElement('input');
+  box.type = 'checkbox';
+  box.value = name;
+  box.checked = services.has(name);
+  box.addEventListener('change', () => {
+    if (box.checked) services.add(name);
+    else services.delete(name);
+    saveServices();
+    syncServiceControls();
+    render();
+  });
+  label.append(box, appIcon(name), el('span', 'service-name', name));
+  serviceListEl.append(label);
+}
+
+onlyMineToggle.checked = readOnlyMine();
+onlyMineToggle.addEventListener('change', () => {
+  try {
+    localStorage.setItem(ONLY_MINE_KEY, onlyMineToggle.checked ? '1' : '0');
+  } catch {
+    // storage unavailable; selection still applies for this session
+  }
+  render();
+});
+// While no services are picked the switch is aria-disabled: block the toggle and show the hint.
+onlyMineToggle.addEventListener('click', (e) => {
+  if (services.size) return;
+  e.preventDefault();
+  onlyMineHint.classList.add('is-open');
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.switch-group')) onlyMineHint.classList.remove('is-open');
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') onlyMineHint.classList.remove('is-open');
+});
+syncServiceControls();
 
 load();
 setInterval(load, REFRESH_MS);

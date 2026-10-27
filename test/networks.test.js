@@ -1,7 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { APPS, LEAGUE_PASS_APPS, NETWORKS, resolveNetwork, watchOptions } from '../public/networks.js';
+import {
+  APPS,
+  LEAGUE_PASS_APPS,
+  NETWORKS,
+  NOT_ON_SERVICES,
+  onlyServices,
+  parseServices,
+  resolveNetwork,
+  watchOptions,
+} from '../public/networks.js';
 
 const b = (name, abbr) => ({ name, abbr });
 const NBCSP = b('NBC Sports Philadelphia', 'NBCSP/PCK-PHI');
@@ -97,4 +106,36 @@ test('(j) every listed app has a vendored icon', () => {
     assert.ok(APPS[name], `APPS is missing "${name}"`);
     assert.ok(existsSync(new URL(`../public/${APPS[name].icon}`, import.meta.url)), `missing file public/${APPS[name].icon}`);
   }
+});
+
+test('(k) onlyServices limits apps to my services', () => {
+  const game = mk('0022600117', [], [NBCSP]);
+
+  const prime = onlyServices(watchOptions(game, 'out'), new Set(['Prime Video']));
+  assert.deepEqual(apps(prime.direct), ['Prime Video (NBA League Pass channel, subject to blackouts)']);
+  assert.deepEqual(prime.live, []);
+  assert.equal(prime.empty, false);
+  assert.equal(prime.emptyMessage, null);
+
+  const fuboIn = onlyServices(watchOptions(game, 'in'), new Set(['Fubo']));
+  assert.deepEqual(fuboIn.direct, []);
+  assert.deepEqual(apps(fuboIn.live), ['Fubo']);
+
+  const unfiltered = watchOptions(game, 'out');
+  const fuboOut = onlyServices(unfiltered, new Set(['Fubo']));
+  assert.equal(fuboOut.empty, true);
+  assert.equal(fuboOut.emptyMessage, NOT_ON_SERVICES);
+  assert.deepEqual(fuboOut.networks, unfiltered.networks);
+
+  const none = onlyServices(watchOptions(mk('0022600122', [], []), 'in'), new Set(['Fubo']));
+  assert.equal(none.emptyMessage, 'No in-market broadcast listed yet');
+});
+
+test('(l) parseServices keeps only known app names', () => {
+  assert.deepEqual([...parseServices(null)], []);
+  assert.deepEqual([...parseServices('not json')], []);
+  assert.deepEqual([...parseServices('{"Fubo":true}')], []);
+  assert.deepEqual([...parseServices('"Fubo"')], []);
+  assert.deepEqual([...parseServices('["Bogus","Fubo",1,"__proto__"]')], ['Fubo']);
+  assert.deepEqual([...parseServices('["Fubo","Peacock","Fubo"]')], ['Fubo', 'Peacock']);
 });

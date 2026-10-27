@@ -31,7 +31,19 @@
           <span class="track" aria-hidden="true"></span>
           Show past games <span id="past-count"></span>
         </label>
+        <div class="switch-group">
+          <label class="switch">
+            <input type="checkbox" id="only-mine" role="switch">
+            <span class="track" aria-hidden="true"></span>
+            Only my services
+          </label>
+          <span id="only-mine-hint" class="hint" role="tooltip">Pick services first</span>
+        </div>
       </div>
+      <details class="services">
+        <summary>My services <span id="services-count"></span></summary>
+        <div id="service-list" class="service-list" role="group" aria-label="My services"></div>
+      </details>
       <p id="status" class="sub"></p>
     </div>
   </header>
